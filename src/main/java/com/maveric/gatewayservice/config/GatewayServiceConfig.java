@@ -41,6 +41,9 @@ public class GatewayServiceConfig {
                         .uri(userProperties.getUri()))
 
                 .route(routeToBalance -> routeToBalance.path(balanceProperties.getPath())
+                        .filters(f ->
+                                f.filter(authenticationPreFilter.apply(
+                                        new AuthenticationPreFilter.Config())))
                         .uri(balanceProperties.getUri()))
                 .build();
     }
