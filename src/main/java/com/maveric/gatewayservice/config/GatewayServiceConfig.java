@@ -2,6 +2,7 @@ package com.maveric.gatewayservice.config;
 
 //import com.maveric.gatewayservice.filter.AuthenticationPreFilter;
 import com.maveric.gatewayservice.filter.AuthenticationPreFilter;
+import com.maveric.gatewayservice.properties.AccountProperties;
 import com.maveric.gatewayservice.properties.BalanceProperties;
 import com.maveric.gatewayservice.properties.UserProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class GatewayServiceConfig {
 
    @Autowired
    BalanceProperties balanceProperties;
+
+   @Autowired
+   AccountProperties accountProperties;
 
    @Autowired
    AuthenticationPreFilter authenticationPreFilter;
@@ -45,6 +49,11 @@ public class GatewayServiceConfig {
                                 f.filter(authenticationPreFilter.apply(
                                         new AuthenticationPreFilter.Config())))
                         .uri(balanceProperties.getUri()))
+                .route(routeToAccount -> routeToAccount.path(accountProperties.getPath())
+                        .filters(f ->
+                                f.filter(authenticationPreFilter.apply(
+                                        new AuthenticationPreFilter.Config())))
+                        .uri(accountProperties.getUri()))
                 .build();
     }
 
