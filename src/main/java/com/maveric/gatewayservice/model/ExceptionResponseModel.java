@@ -10,6 +10,4 @@ import java.util.Date;
 public class ExceptionResponseModel {
     private String code ;
     private String message;
-    private String description;
-    private Date  date;
 }

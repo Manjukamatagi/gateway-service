@@ -3,6 +3,7 @@ package com.maveric.gatewayservice.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.maveric.gatewayservice.constant.ErrorMessageConstant;
 import com.maveric.gatewayservice.model.ExceptionResponseModel;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,19 +58,20 @@ public class AuthenticationPreFilter extends AbstractGatewayFilterFactory<Authen
                             return exchange;
                         }).flatMap(chain::filter).onErrorResume(error -> {
                             log.info("Error Happened");
-                            HttpStatus errorCode = null;
+                            HttpStatus errorStatus=HttpStatus.FORBIDDEN;
+                            String errorCode = "";
                             String errorMsg = "";
                             if (error instanceof WebClientResponseException) {
                                 WebClientResponseException webCLientException = (WebClientResponseException) error;
-                                errorCode = webCLientException.getStatusCode();
-                                errorMsg = webCLientException.getStatusText();
+                                errorCode = ErrorMessageConstant.JWT_ERROR_CODE;
+                                errorMsg = ErrorMessageConstant.JWT_ERROR_MESSAGE;
 
                             } else {
-                                errorCode = HttpStatus.BAD_GATEWAY;
-                                errorMsg = HttpStatus.BAD_GATEWAY.getReasonPhrase();
+                                errorCode = ErrorMessageConstant.JWT_ERROR_CODE;
+                                errorMsg = ErrorMessageConstant.JWT_ERROR_MESSAGE;
                             }
 //                            AuthorizationFilter.AUTH_FAILED_CODE
-                            return onError(exchange, String.valueOf(errorCode.value()) ,errorMsg, "JWT Authentication Failed", errorCode);
+                            return onError(exchange, errorCode ,errorMsg, "JWT Authentication Failed", errorStatus);
                         });
         };
 
@@ -83,7 +85,7 @@ public class AuthenticationPreFilter extends AbstractGatewayFilterFactory<Authen
         response.setStatusCode(httpStatus);
         try {
             response.getHeaders().add("Content-Type", "application/json");
-            ExceptionResponseModel data = new ExceptionResponseModel(errCode, err, errDetails, new Date());
+            ExceptionResponseModel data = new ExceptionResponseModel(errCode, err);
             byte[] byteData = objectMapper.writeValueAsBytes(data);
             return response.writeWith(Mono.just(byteData).map(t -> dataBufferFactory.wrap(t)));
 
