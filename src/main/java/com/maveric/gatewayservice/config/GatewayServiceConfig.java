@@ -2,9 +2,7 @@ package com.maveric.gatewayservice.config;
 
 //import com.maveric.gatewayservice.filter.AuthenticationPreFilter;
 import com.maveric.gatewayservice.filter.AuthenticationPreFilter;
-import com.maveric.gatewayservice.properties.AccountProperties;
-import com.maveric.gatewayservice.properties.BalanceProperties;
-import com.maveric.gatewayservice.properties.UserProperties;
+import com.maveric.gatewayservice.properties.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -27,7 +25,13 @@ public class GatewayServiceConfig {
    AccountProperties accountProperties;
 
    @Autowired
+   AuthProperties authProperties;
+
+   @Autowired
    AuthenticationPreFilter authenticationPreFilter;
+
+   @Autowired
+    TransactionProperties transactionProperties;
 
     private final WebClient.Builder webClientBuilder;
 
@@ -54,6 +58,13 @@ public class GatewayServiceConfig {
                                 f.filter(authenticationPreFilter.apply(
                                         new AuthenticationPreFilter.Config())))
                         .uri(accountProperties.getUri()))
+                .route(routeToAccount -> routeToAccount.path(transactionProperties.getPath())
+                        .filters(f ->
+                                f.filter(authenticationPreFilter.apply(
+                                        new AuthenticationPreFilter.Config())))
+                        .uri(transactionProperties.getUri()))
+                .route(routeToAccount -> routeToAccount.path(authProperties.getPath())
+                        .uri(authProperties.getUri()))
                 .build();
     }
 
