@@ -71,7 +71,7 @@ public class AuthenticationPreFilter extends AbstractGatewayFilterFactory<Authen
                                 errorMsg = ErrorMessageConstant.JWT_ERROR_MESSAGE;
                             }
 //                            AuthorizationFilter.AUTH_FAILED_CODE
-                            return onError(exchange, errorCode ,errorMsg, "JWT Authentication Failed", errorStatus);
+                            return onError(exchange, errorCode ,errorMsg, errorStatus);
                         });
         };
 
@@ -79,7 +79,7 @@ public class AuthenticationPreFilter extends AbstractGatewayFilterFactory<Authen
     }
 
 
-    private Mono<Void> onError(ServerWebExchange exchange, String errCode, String err, String errDetails, HttpStatus httpStatus) {
+    private Mono<Void> onError(ServerWebExchange exchange, String errCode, String err, HttpStatus httpStatus) {
         DataBufferFactory dataBufferFactory = exchange.getResponse().bufferFactory();
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
